@@ -1,0 +1,2093 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hack-N-Forge | AI Cheat Detection System</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #050a0f;
+    --surface: #0c1520;
+    --surface2: #112030;
+    --border: #1a3040;
+    --accent: #00d4ff;
+    --accent2: #ff4d6d;
+    --accent3: #00ff8c;
+    --warn: #ffb700;
+    --text: #e2eaf2;
+    --muted: #607080;
+    --safe: #00ff8c;
+    --danger: #ff4d6d;
+    --mid: #ffb700;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── HEADER ── */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(5,10,15,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--accent);
+  }
+  .logo span { color: var(--accent2); }
+
+  .header-badges {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .badge-live { border-color: var(--accent3); color: var(--accent3); animation: pulse-badge 2s infinite; }
+  .badge-ai { border-color: var(--accent); color: var(--accent); }
+  .badge-team { border-color: var(--muted); color: var(--muted); }
+
+  @keyframes pulse-badge {
+    0%,100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative;
+    z-index: 1;
+    padding: 64px 32px 48px;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: center;
+  }
+
+  .hero-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .hero-label::before {
+    content: '';
+    display: inline-block;
+    width: 24px;
+    height: 1px;
+    background: var(--accent);
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 20px;
+    letter-spacing: -1px;
+  }
+  h1 .highlight { color: var(--accent); }
+  h1 .highlight2 { color: var(--accent2); }
+
+  .hero-desc {
+    color: var(--muted);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    margin-bottom: 28px;
+    max-width: 480px;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .hero-stat {
+    text-align: center;
+  }
+  .hero-stat .num {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--accent);
+    display: block;
+  }
+  .hero-stat .lbl {
+    font-size: 0.7rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  /* ── CHEAT CAM SECTION ── */
+  .cam-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .cam-header {
+    background: var(--surface2);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .cam-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .rec-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent2);
+    animation: pulse-dot 1.5s infinite;
+  }
+  @keyframes pulse-dot {
+    0%,100% { box-shadow: 0 0 0 0 rgba(255,77,109,0.6); }
+    50% { box-shadow: 0 0 0 6px rgba(255,77,109,0); }
+  }
+
+  /* Webcam simulation */
+  .cam-view {
+    position: relative;
+    background: #020d14;
+    aspect-ratio: 16/10;
+    overflow: hidden;
+  }
+
+  /* ── LIVE DETECTION PANEL ── */
+  .live-detection-section {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto 40px;
+    padding: 0 32px;
+  }
+
+  .live-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .live-panel-header {
+    background: var(--surface2);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .live-panel-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .live-feed-wrap {
+    position: relative;
+    background: #020d14;
+    aspect-ratio: 16/9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .live-feed-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+
+  .live-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    text-align: center;
+    padding: 40px;
+  }
+
+  .live-placeholder .ph-icon { font-size: 3rem; opacity: 0.3; }
+
+  .btn-detect {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 10px 24px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+  }
+
+  .btn-detect.start {
+    background: var(--accent3);
+    color: #050a0f;
+  }
+  .btn-detect.start:hover { filter: brightness(1.15); }
+
+  .btn-detect.stop {
+    background: var(--accent2);
+    color: #fff;
+  }
+  .btn-detect.stop:hover { filter: brightness(1.15); }
+
+  .btn-detect.loading {
+    background: var(--warn);
+    color: #050a0f;
+    cursor: wait;
+  }
+
+  .detect-status {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid var(--muted);
+    color: var(--muted);
+    transition: all 0.3s;
+  }
+  .detect-status.active {
+    border-color: var(--accent3);
+    color: var(--accent3);
+    animation: pulse-badge 2s infinite;
+  }
+
+  .cam-face {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90px;
+    height: 110px;
+  }
+
+  .cam-face .face-circle {
+    width: 70px; height: 70px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1a3a4a, #0d2030);
+    border: 2px solid var(--border);
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .cam-face .face-body {
+    width: 90px; height: 55px;
+    background: linear-gradient(135deg, #1a3a4a, #0d2030);
+    border: 2px solid var(--border);
+    border-radius: 50% 50% 0 0;
+    position: absolute;
+    bottom: 0; left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .tracking-box {
+    position: absolute;
+    border: 1.5px solid var(--accent);
+    border-radius: 4px;
+    animation: track-move 4s ease-in-out infinite;
+  }
+  .tb1 { width: 84px; height: 100px; top: 50%; left: 50%; transform: translate(-50%, -55%); }
+  .tb2 { width: 20px; height: 12px; top: calc(50% - 28px); left: calc(50% - 8px); border-color: var(--accent3); border-radius: 50%; }
+  .tb3 { width: 20px; height: 12px; top: calc(50% - 28px); left: calc(50% + 2px); border-color: var(--accent3); border-radius: 50%; }
+
+  @keyframes track-move {
+    0%,100% { transform: translate(-50%, -55%); border-color: var(--accent); }
+    30% { transform: translate(-45%, -55%) rotate(5deg); border-color: var(--mid); }
+    60% { transform: translate(-55%, -52%) rotate(-3deg); border-color: var(--mid); }
+    80% { transform: translate(-50%, -58%) rotate(8deg); border-color: var(--danger); }
+  }
+
+  .scan-line {
+    position: absolute;
+    left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    animation: scan 3s linear infinite;
+    opacity: 0.5;
+  }
+  @keyframes scan { from { top: 0; } to { top: 100%; } }
+
+  .corner-tl, .corner-tr, .corner-bl, .corner-br {
+    position: absolute;
+    width: 16px; height: 16px;
+    border-color: var(--accent);
+    border-style: solid;
+    opacity: 0.7;
+  }
+  .corner-tl { top: 8px; left: 8px; border-width: 2px 0 0 2px; }
+  .corner-tr { top: 8px; right: 8px; border-width: 2px 2px 0 0; }
+  .corner-bl { bottom: 8px; left: 8px; border-width: 0 0 2px 2px; }
+  .corner-br { bottom: 8px; right: 8px; border-width: 0 2px 2px 0; }
+
+  /* metrics overlay on cam */
+  .cam-overlay-metrics {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .cam-metric-chip {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.55rem;
+    background: rgba(5,10,15,0.8);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 3px 6px;
+    color: var(--accent3);
+    white-space: nowrap;
+  }
+
+  /* ── SCORE BAR ── */
+  .score-section {
+    padding: 16px;
+  }
+
+  .score-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .score-value-big {
+    font-family: 'Syne', sans-serif;
+    font-size: 2.4rem;
+    font-weight: 800;
+    color: var(--mid);
+    line-height: 1;
+  }
+
+  .score-bar-wrap {
+    height: 6px;
+    background: var(--surface2);
+    border-radius: 4px;
+    margin: 8px 0;
+    overflow: hidden;
+  }
+
+  .score-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--accent3), var(--mid), var(--danger));
+    width: 62%;
+    animation: bar-grow 2s ease-out forwards;
+  }
+  @keyframes bar-grow { from { width: 0; } to { width: 62%; } }
+
+  .score-chips {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    margin-top: 10px;
+  }
+
+  .score-chip {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px;
+    text-align: center;
+  }
+
+  .score-chip .chip-val {
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    display: block;
+  }
+  .score-chip .chip-lbl {
+    font-size: 0.6rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .c-danger { color: var(--danger); }
+  .c-warn { color: var(--mid); }
+  .c-safe { color: var(--safe); }
+
+  /* ── MAIN CONTENT ── */
+  .main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 32px 60px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── ANALYTICS GRID ── */
+  .analytics-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+
+  .kpi-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .kpi-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent);
+  }
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--accent-line, var(--accent));
+  }
+
+  .kpi-icon {
+    font-size: 1.4rem;
+    margin-bottom: 10px;
+    display: block;
+  }
+  .kpi-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .kpi-lbl {
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+  .kpi-delta {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    padding: 2px 6px;
+    border-radius: 20px;
+  }
+  .delta-up { background: rgba(0,255,140,0.12); color: var(--safe); }
+  .delta-down { background: rgba(255,77,109,0.12); color: var(--danger); }
+
+  /* ── BEHAVIOR BARS ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 28px; }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .panel-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 16px;
+    color: var(--text);
+  }
+
+  .behavior-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .behavior-label {
+    font-size: 0.75rem;
+    color: var(--muted);
+    min-width: 120px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .behavior-track {
+    flex: 1;
+    height: 4px;
+    background: var(--surface2);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .behavior-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 1s ease-out;
+  }
+  .behavior-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text);
+    min-width: 36px;
+    text-align: right;
+  }
+
+  /* ── CHEAT SCORE CAM SECTION ── */
+  .cam-section {
+    margin-bottom: 28px;
+  }
+
+  .cam-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+
+  .student-cam-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s;
+    cursor: pointer;
+  }
+  .student-cam-card:hover { transform: translateY(-2px); }
+  .student-cam-card.alert { border-color: var(--danger); animation: flicker 2s infinite; }
+  .student-cam-card.warn { border-color: var(--mid); }
+  .student-cam-card.safe { border-color: var(--safe); }
+  @keyframes flicker {
+    0%,100% { box-shadow: 0 0 0 0 rgba(255,77,109,0); }
+    50% { box-shadow: 0 0 12px 2px rgba(255,77,109,0.35); }
+  }
+
+  .student-cam-view {
+    position: relative;
+    background: #020d14;
+    aspect-ratio: 4/3;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Mini face avatar */
+  .mini-avatar {
+    width: 48px;
+    height: 58px;
+    position: relative;
+    animation: subtle-move 4s ease-in-out infinite;
+  }
+  .mini-avatar .mhead {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1a3a4a, #0d2030);
+    border: 1px solid var(--border);
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+  }
+  .mini-avatar .mbody {
+    width: 48px; height: 26px;
+    background: linear-gradient(135deg, #1a3a4a, #0d2030);
+    border: 1px solid var(--border);
+    border-radius: 50% 50% 0 0;
+    position: absolute;
+    bottom: 0; left: 0;
+  }
+  @keyframes subtle-move {
+    0%,100% { transform: rotate(0deg); }
+    25% { transform: rotate(3deg) translateX(3px); }
+    75% { transform: rotate(-3deg) translateX(-3px); }
+  }
+
+  .student-score-badge {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 800;
+    padding: 4px 8px;
+    border-radius: 6px;
+    line-height: 1;
+  }
+  .sb-danger { background: rgba(255,77,109,0.25); color: var(--danger); border: 1px solid var(--danger); }
+  .sb-warn { background: rgba(255,183,0,0.2); color: var(--mid); border: 1px solid var(--mid); }
+  .sb-safe { background: rgba(0,255,140,0.15); color: var(--safe); border: 1px solid var(--safe); }
+
+  .student-cam-info {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .student-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+  .student-status {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .status-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+
+  .mini-scan { position: absolute; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--accent), transparent); animation: scan 2.5s linear infinite; opacity: 0.4; }
+
+  .track-box-mini {
+    position: absolute;
+    border: 1px solid var(--accent);
+    border-radius: 3px;
+    width: 56px; height: 65px;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -60%);
+  }
+  .track-box-mini.alert { border-color: var(--danger); animation: track-alert 1s ease-in-out infinite; }
+  .track-box-mini.warn { border-color: var(--mid); }
+  @keyframes track-alert {
+    0%,100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* ── TIMELINE ── */
+  .timeline-row {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 8px;
+    align-items: center;
+  }
+  .tl-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--muted);
+    min-width: 80px;
+  }
+  .tl-blocks {
+    display: flex;
+    gap: 2px;
+    flex: 1;
+  }
+  .tl-block {
+    height: 14px;
+    border-radius: 2px;
+    flex: 1;
+    max-width: 18px;
+  }
+  .tl-safe { background: rgba(0,255,140,0.3); }
+  .tl-warn { background: rgba(255,183,0,0.4); }
+  .tl-danger { background: rgba(255,77,109,0.5); }
+  .tl-empty { background: var(--surface2); }
+
+  /* ── DONUT CHART SVG ── */
+  .donut-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+    margin-top: 8px;
+  }
+  .donut-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.72rem;
+    color: var(--muted);
+  }
+  .legend-dot {
+    width: 8px; height: 8px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  /* ── ALERTS TABLE ── */
+  .alerts-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .alerts-table th {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    text-align: left;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .alerts-table td {
+    padding: 10px 12px;
+    font-size: 0.75rem;
+    border-bottom: 1px solid rgba(26,48,64,0.4);
+  }
+  .alerts-table tr:last-child td { border-bottom: none; }
+  .alerts-table tr:hover td { background: rgba(0,212,255,0.03); }
+
+  .tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.55rem;
+    padding: 2px 8px;
+    border-radius: 20px;
+    text-transform: uppercase;
+  }
+  .tag-high { background: rgba(255,77,109,0.15); color: var(--danger); border: 1px solid rgba(255,77,109,0.3); }
+  .tag-med { background: rgba(255,183,0,0.12); color: var(--mid); border: 1px solid rgba(255,183,0,0.3); }
+  .tag-low { background: rgba(0,255,140,0.1); color: var(--safe); border: 1px solid rgba(0,255,140,0.2); }
+
+  /* ── TECH STACK ── */
+  .tech-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .tech-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 12px;
+    text-align: center;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .tech-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .tech-icon { font-size: 1.6rem; display: block; margin-bottom: 8px; }
+  .tech-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text);
+    display: block;
+    margin-bottom: 4px;
+  }
+  .tech-desc { font-size: 0.6rem; color: var(--muted); }
+
+  /* ── CAM TOGGLE BUTTON ── */
+  .cam-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 5px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--accent3);
+    background: rgba(0,255,140,0.1);
+    color: var(--accent3);
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+    flex-shrink: 0;
+  }
+  .cam-toggle-btn:hover { background: rgba(0,255,140,0.2); transform: scale(1.03); }
+  .cam-toggle-btn.off {
+    border-color: var(--muted);
+    background: rgba(96,112,128,0.1);
+    color: var(--muted);
+  }
+  .cam-toggle-btn .btn-icon { font-size: 0.7rem; }
+
+  /* When cam is off */
+  .cam-view.cam-off .scan-line,
+  .cam-view.cam-off .tracking-box,
+  .cam-view.cam-off .cam-face,
+  .cam-view.cam-off .cam-overlay-metrics,
+  .cam-view.cam-off .corner-tl,
+  .cam-view.cam-off .corner-tr,
+  .cam-view.cam-off .corner-bl,
+  .cam-view.cam-off .corner-br { display: none !important; }
+
+  .cam-off-overlay {
+    display: none;
+    position: absolute;
+    inset: 0;
+    background: rgba(5,10,15,0.96);
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 10;
+  }
+  .cam-view.cam-off .cam-off-overlay { display: flex; }
+  .cam-off-icon { font-size: 2rem; opacity: 0.4; }
+  .cam-off-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+  }
+  .score-section.cam-off { opacity: 0.35; pointer-events: none; }
+
+  /* Mini student cam off state */
+  .student-cam-view.cam-off .mini-scan,
+  .student-cam-view.cam-off .mini-avatar,
+  .student-cam-view.cam-off .track-box-mini,
+  .student-cam-view.cam-off .student-score-badge { display: none !important; }
+  .student-cam-view.cam-off .cam-off-overlay { display: flex; }
+
+  /* Global cam off controls bar */
+  .cam-controls-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .cam-all-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .cam-all-btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 6px 14px;
+    border-radius: 6px;
+    border: 1px solid;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+  }
+  .cam-all-btn.on-all {
+    border-color: var(--accent3);
+    background: rgba(0,255,140,0.1);
+    color: var(--accent3);
+  }
+  .cam-all-btn.on-all:hover { background: rgba(0,255,140,0.22); }
+  .cam-all-btn.off-all {
+    border-color: var(--danger);
+    background: rgba(255,77,109,0.1);
+    color: var(--danger);
+  }
+  .cam-all-btn.off-all:hover { background: rgba(255,77,109,0.2); }
+
+  /* ── FOOTER ── */
+  footer {
+    position: relative;
+    z-index: 1;
+    border-top: 1px solid var(--border);
+    padding: 24px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .footer-brand { font-family: 'Syne', sans-serif; font-weight: 700; color: var(--accent); font-size: 0.85rem; }
+  .footer-tagline { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; color: var(--muted); font-style: italic; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; gap: 32px; }
+    .analytics-grid { grid-template-columns: repeat(2, 1fr); }
+    .two-col { grid-template-columns: 1fr; }
+    .cam-grid { grid-template-columns: repeat(2, 1fr); }
+    .tech-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 600px) {
+    header { padding: 12px 16px; }
+    .hero { padding: 32px 16px 24px; }
+    .main { padding: 0 16px 40px; }
+    .analytics-grid { grid-template-columns: 1fr 1fr; }
+    .cam-grid { grid-template-columns: repeat(2, 1fr); }
+    .tech-grid { grid-template-columns: repeat(2, 1fr); }
+    h1 { font-size: 1.8rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo">HACK<span>-N-</span>FORGE</div>
+  <div class="header-badges">
+    <span class="badge badge-live">● Live</span>
+    <span class="badge badge-ai">AI Proctoring</span>
+    <span class="badge badge-team">Team Matrix</span>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div>
+    <div class="hero-label">AI-Powered Exam Integrity</div>
+    <h1>Cheat <span class="highlight">Detection</span><br>Powered by <span class="highlight2">Vision AI</span></h1>
+    <p class="hero-desc">Real-time behavioral analysis using YOLO, MediaPipe & Isolation Forest to detect and flag suspicious activity during online assessments. Scalable. Accurate. Fair.</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><span class="num">98.4%</span><span class="lbl">Accuracy</span></div>
+      <div class="hero-stat"><span class="num" style="color:var(--accent2)">12ms</span><span class="lbl">Latency</span></div>
+      <div class="hero-stat"><span class="num" style="color:var(--accent3)">∞</span><span class="lbl">Scalable</span></div>
+    </div>
+  </div>
+
+  <!-- CHEAT SCORE CAM WIDGET -->
+  <div class="cam-panel">
+    <div class="cam-header">
+      <div class="cam-title"><div class="rec-dot" id="hero-rec-dot"></div> LIVE CAM — Student #0042</div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span class="badge badge-ai" style="font-size:0.55rem">YOLO+MediaPipe</span>
+        <button class="cam-toggle-btn" id="hero-cam-btn" onclick="toggleHeroCam()">
+          <span class="btn-icon">📷</span><span id="hero-cam-label">CAM ON</span>
+        </button>
+      </div>
+    </div>
+    <div class="cam-view" id="hero-cam-view">
+      <div class="scan-line"></div>
+      <div class="corner-tl"></div><div class="corner-tr"></div>
+      <div class="corner-bl"></div><div class="corner-br"></div>
+      <div class="cam-face">
+        <div class="face-circle"></div>
+        <div class="face-body"></div>
+      </div>
+      <div class="tracking-box tb1"></div>
+      <div class="tracking-box tb2"></div>
+      <div class="tracking-box tb3"></div>
+      <div class="cam-overlay-metrics">
+        <div class="cam-metric-chip" id="chip-head">HEAD: 0° YAW</div>
+        <div class="cam-metric-chip" id="chip-gaze">GAZE: —</div>
+        <div class="cam-metric-chip" id="chip-phone" style="color:var(--accent3)">PHONE: CLEAR</div>
+        <div class="cam-metric-chip" id="chip-anomaly" style="color:var(--accent3)">ANOMALY: LOW</div>
+      </div>
+      <div class="cam-off-overlay">
+        <div class="cam-off-icon">📷</div>
+        <div class="cam-off-text">Camera Disabled</div>
+      </div>
+    </div>
+    <div class="score-section" id="hero-score-section">
+      <div class="score-label">
+        <span>Cheat Risk Score</span>
+        <span id="score-label-status" style="color:var(--safe)">CLEAN</span>
+      </div>
+      <div class="score-value-big" id="score-value-big" style="color:var(--safe)">0<span style="font-size:1rem;color:var(--muted)">/300</span></div>
+      <div class="score-bar-wrap"><div class="score-bar-fill" id="score-bar-fill" style="width:0%;animation:none"></div></div>
+      <div class="score-chips">
+        <div class="score-chip"><span class="chip-val c-safe" id="chip-gaze-dev">LOW</span><span class="chip-lbl">Gaze Dev.</span></div>
+        <div class="score-chip"><span class="chip-val c-safe" id="chip-head-pose">LOW</span><span class="chip-lbl">Head Pose</span></div>
+        <div class="score-chip"><span class="chip-val c-safe" id="chip-phone-det">NONE</span><span class="chip-lbl">Phone Det.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MAIN DASHBOARD -->
+<main class="main">
+
+  <!-- ANALYTICS KPIs -->
+  <div class="section-title">Live Analytics Dashboard</div>
+  <div class="analytics-grid">
+    <div class="kpi-card" style="--accent-line: var(--accent)">
+      <span class="kpi-icon">👁️</span>
+      <div class="kpi-num" style="color:var(--accent)">247</div>
+      <div class="kpi-lbl">Students Monitored</div>
+      <span class="kpi-delta delta-up">+12 active</span>
+    </div>
+    <div class="kpi-card" style="--accent-line: var(--danger)">
+      <span class="kpi-icon">🚨</span>
+      <div class="kpi-num" style="color:var(--danger)">18</div>
+      <div class="kpi-lbl">High-Risk Flags</div>
+      <span class="kpi-delta delta-down">+3 new</span>
+    </div>
+    <div class="kpi-card" style="--accent-line: var(--mid)">
+      <span class="kpi-icon">⚠️</span>
+      <div class="kpi-num" style="color:var(--mid)">43</div>
+      <div class="kpi-lbl">Suspicious Events</div>
+      <span class="kpi-delta delta-down">Last 10 min</span>
+    </div>
+    <div class="kpi-card" style="--accent-line: var(--safe)">
+      <span class="kpi-icon">✅</span>
+      <div class="kpi-num" style="color:var(--safe)">186</div>
+      <div class="kpi-lbl">Clean Sessions</div>
+      <span class="kpi-delta delta-up">75.3% safe</span>
+    </div>
+  </div>
+
+  <!-- BEHAVIOR + DONUT -->
+  <div class="two-col">
+    <div class="panel">
+      <div class="panel-title">Behavior Anomaly Breakdown</div>
+
+      <div class="behavior-row">
+        <span class="behavior-label">Gaze Deviation</span>
+        <div class="behavior-track"><div class="behavior-fill" id="bar-gaze-fill" style="width:0%;background:linear-gradient(90deg,var(--danger),#ff8a9a)"></div></div>
+        <span class="behavior-val c-safe" id="bar-gaze-val">0%</span>
+      </div>
+      <div class="behavior-row">
+        <span class="behavior-label">Head Pose Shift</span>
+        <div class="behavior-track"><div class="behavior-fill" id="bar-head-fill" style="width:0%;background:linear-gradient(90deg,var(--mid),#ffd966)"></div></div>
+        <span class="behavior-val c-safe" id="bar-head-val">0%</span>
+      </div>
+      <div class="behavior-row">
+        <span class="behavior-label">Phone Detection</span>
+        <div class="behavior-track"><div class="behavior-fill" id="bar-phone-fill" style="width:0%;background:linear-gradient(90deg,var(--mid),#ffd966)"></div></div>
+        <span class="behavior-val c-safe" id="bar-phone-val">0%</span>
+      </div>
+      <div class="behavior-row">
+        <span class="behavior-label">Multi-person</span>
+        <div class="behavior-track"><div class="behavior-fill" style="width:11%;background:linear-gradient(90deg,var(--safe),#66ffba)"></div></div>
+        <span class="behavior-val c-safe">11%</span>
+      </div>
+      <div class="behavior-row">
+        <span class="behavior-label">Suspicious Gesture</span>
+        <div class="behavior-track"><div class="behavior-fill" style="width:39%;background:linear-gradient(90deg,var(--danger),#ff8a9a)"></div></div>
+        <span class="behavior-val c-danger">39%</span>
+      </div>
+      <div class="behavior-row">
+        <span class="behavior-label">Temporal Pattern</span>
+        <div class="behavior-track"><div class="behavior-fill" style="width:47%;background:linear-gradient(90deg,var(--mid),#ffd966)"></div></div>
+        <span class="behavior-val c-warn">47%</span>
+      </div>
+
+      <!-- Session timeline -->
+      <div style="margin-top:16px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.1em;">Session Timeline (60 min)</div>
+        <div class="timeline-row">
+          <span class="tl-label">Gaze</span>
+          <div class="tl-blocks">
+            <div class="tl-block tl-safe"></div><div class="tl-block tl-safe"></div><div class="tl-block tl-safe"></div>
+            <div class="tl-block tl-warn"></div><div class="tl-block tl-safe"></div><div class="tl-block tl-danger"></div>
+            <div class="tl-block tl-danger"></div><div class="tl-block tl-warn"></div><div class="tl-block tl-danger"></div>
+            <div class="tl-block tl-safe"></div><div class="tl-block tl-warn"></div><div class="tl-block tl-danger"></div>
+          </div>
+        </div>
+        <div class="timeline-row">
+          <span class="tl-label">Head Pose</span>
+          <div class="tl-blocks">
+            <div class="tl-block tl-safe"></div><div class="tl-block tl-safe"></div><div class="tl-block tl-warn"></div>
+            <div class="tl-block tl-safe"></div><div class="tl-block tl-warn"></div><div class="tl-block tl-warn"></div>
+            <div class="tl-block tl-safe"></div><div class="tl-block tl-danger"></div><div class="tl-block tl-warn"></div>
+            <div class="tl-block tl-safe"></div><div class="tl-block tl-safe"></div><div class="tl-block tl-warn"></div>
+          </div>
+        </div>
+        <div class="timeline-row">
+          <span class="tl-label">Objects</span>
+          <div class="tl-blocks">
+            <div class="tl-block tl-safe"></div><div class="tl-block tl-safe"></div><div class="tl-block tl-safe"></div>
+            <div class="tl-block tl-safe"></div><div class="tl-block tl-safe"></div><div class="tl-block tl-safe"></div>
+            <div class="tl-block tl-danger"></div><div class="tl-block tl-danger"></div><div class="tl-block tl-safe"></div>
+            <div class="tl-block tl-safe"></div><div class="tl-block tl-safe"></div><div class="tl-block tl-safe"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Risk Distribution</div>
+      <div class="donut-row">
+        <!-- SVG Donut Chart -->
+        <svg width="140" height="140" viewBox="0 0 140 140">
+          <defs>
+            <filter id="glow">
+              <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+              <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+          <!-- High risk: 18/247 = ~26deg  danger -->
+          <circle cx="70" cy="70" r="48" fill="none" stroke="#112030" stroke-width="22"/>
+          <!-- Safe 75% -->
+          <circle cx="70" cy="70" r="48" fill="none" stroke="var(--safe)" stroke-width="18"
+            stroke-dasharray="226.2 75.4" stroke-dashoffset="0" filter="url(#glow)" opacity="0.85"/>
+          <!-- Mid 17% -->
+          <circle cx="70" cy="70" r="48" fill="none" stroke="var(--mid)" stroke-width="18"
+            stroke-dasharray="51.2 250.4" stroke-dashoffset="-226.2" filter="url(#glow)" opacity="0.85"/>
+          <!-- High 8% -->
+          <circle cx="70" cy="70" r="48" fill="none" stroke="var(--danger)" stroke-width="18"
+            stroke-dasharray="24.1 277.5" stroke-dashoffset="-277.4" filter="url(#glow)" opacity="0.9"/>
+          <text x="70" y="65" text-anchor="middle" font-family="Syne,sans-serif" font-size="20" font-weight="800" fill="var(--text)">247</text>
+          <text x="70" y="82" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="7" fill="var(--muted)">STUDENTS</text>
+        </svg>
+        <div class="donut-legend">
+          <div class="legend-item"><div class="legend-dot" style="background:var(--safe)"></div><span>Safe (75.3%) — 186</span></div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--mid)"></div><span>Suspicious (17.4%) — 43</span></div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--danger)"></div><span>High Risk (7.3%) — 18</span></div>
+        </div>
+      </div>
+
+      <div style="margin-top:20px">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--muted);margin-bottom:12px;text-transform:uppercase;letter-spacing:0.1em;">Attention Score Over Time</div>
+        <!-- SVG Line sparkline -->
+        <svg width="100%" height="60" viewBox="0 0 300 60" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="sparkGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="var(--accent)" stop-opacity="0.3"/>
+              <stop offset="100%" stop-color="var(--accent)" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <path d="M0,10 L30,15 L60,8 L90,20 L120,35 L150,28 L180,40 L210,25 L240,45 L270,30 L300,20" fill="none" stroke="var(--accent)" stroke-width="1.5" opacity="0.8"/>
+          <path d="M0,10 L30,15 L60,8 L90,20 L120,35 L150,28 L180,40 L210,25 L240,45 L270,30 L300,20 L300,60 L0,60 Z" fill="url(#sparkGrad)"/>
+          <!-- danger threshold line -->
+          <line x1="0" y1="40" x2="300" y2="40" stroke="var(--danger)" stroke-width="0.8" stroke-dasharray="4 4" opacity="0.5"/>
+          <text x="3" y="37" font-family="JetBrains Mono,monospace" font-size="5" fill="var(--danger)" opacity="0.7">ALERT THRESHOLD</text>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHEAT SCORE CAM GRID -->
+  <div class="cam-section">
+    <div class="cam-controls-bar">
+      <div class="section-title" style="margin-bottom:0;flex:1">Cheat Score Cam — Live Student Feed</div>
+      <div class="cam-all-toggle">
+        <button class="cam-all-btn on-all" onclick="setAllCams(true)">▶ All ON</button>
+        <button class="cam-all-btn off-all" onclick="setAllCams(false)">■ All OFF</button>
+      </div>
+    </div>
+    <div class="cam-grid">
+
+      <!-- Student 1 - ALERT -->
+      <div class="student-cam-card alert" id="card-0">
+        <div class="student-cam-view" id="scv-0">
+          <div class="mini-scan"></div>
+          <div class="mini-avatar">
+            <div class="mhead"></div>
+            <div class="mbody"></div>
+          </div>
+          <div class="track-box-mini alert"></div>
+          <div class="student-score-badge sb-danger">87</div>
+          <div class="cam-off-overlay"><div class="cam-off-icon">📷</div><div class="cam-off-text">Cam Off</div></div>
+        </div>
+        <div class="student-cam-info">
+          <span class="student-name">Arjun Sharma</span>
+          <span class="student-status"><span class="status-dot" style="background:var(--danger)"></span><span style="color:var(--danger)">HIGH RISK · Phone detected</span></span>
+          <button class="cam-toggle-btn" id="sbtn-0" onclick="toggleStudentCam(0)" style="margin-top:6px"><span class="btn-icon">📷</span><span>CAM ON</span></button>
+        </div>
+      </div>
+
+      <!-- Student 2 - WARN -->
+      <div class="student-cam-card warn" id="card-1">
+        <div class="student-cam-view" id="scv-1">
+          <div class="mini-scan"></div>
+          <div class="mini-avatar" style="animation-delay:-1s"><div class="mhead"></div><div class="mbody"></div></div>
+          <div class="track-box-mini warn"></div>
+          <div class="student-score-badge sb-warn">62</div>
+          <div class="cam-off-overlay"><div class="cam-off-icon">📷</div><div class="cam-off-text">Cam Off</div></div>
+        </div>
+        <div class="student-cam-info">
+          <span class="student-name">Priya Verma</span>
+          <span class="student-status"><span class="status-dot" style="background:var(--mid)"></span><span style="color:var(--mid)">SUSPICIOUS · Gaze deviated</span></span>
+          <button class="cam-toggle-btn" id="sbtn-1" onclick="toggleStudentCam(1)" style="margin-top:6px"><span class="btn-icon">📷</span><span>CAM ON</span></button>
+        </div>
+      </div>
+
+      <!-- Student 3 - SAFE -->
+      <div class="student-cam-card safe" id="card-2">
+        <div class="student-cam-view" id="scv-2">
+          <div class="mini-scan"></div>
+          <div class="mini-avatar" style="animation-delay:-2s"><div class="mhead"></div><div class="mbody"></div></div>
+          <div class="track-box-mini"></div>
+          <div class="student-score-badge sb-safe">12</div>
+          <div class="cam-off-overlay"><div class="cam-off-icon">📷</div><div class="cam-off-text">Cam Off</div></div>
+        </div>
+        <div class="student-cam-info">
+          <span class="student-name">Rohit Kumar</span>
+          <span class="student-status"><span class="status-dot" style="background:var(--safe)"></span><span style="color:var(--safe)">CLEAN · Attention 92%</span></span>
+          <button class="cam-toggle-btn" id="sbtn-2" onclick="toggleStudentCam(2)" style="margin-top:6px"><span class="btn-icon">📷</span><span>CAM ON</span></button>
+        </div>
+      </div>
+
+      <!-- Student 4 - WARN -->
+      <div class="student-cam-card warn" id="card-3">
+        <div class="student-cam-view" id="scv-3">
+          <div class="mini-scan"></div>
+          <div class="mini-avatar" style="animation-delay:-0.5s"><div class="mhead"></div><div class="mbody"></div></div>
+          <div class="track-box-mini warn"></div>
+          <div class="student-score-badge sb-warn">54</div>
+          <div class="cam-off-overlay"><div class="cam-off-icon">📷</div><div class="cam-off-text">Cam Off</div></div>
+        </div>
+        <div class="student-cam-info">
+          <span class="student-name">Ananya Singh</span>
+          <span class="student-status"><span class="status-dot" style="background:var(--mid)"></span><span style="color:var(--mid)">SUSPICIOUS · Head pose</span></span>
+          <button class="cam-toggle-btn" id="sbtn-3" onclick="toggleStudentCam(3)" style="margin-top:6px"><span class="btn-icon">📷</span><span>CAM ON</span></button>
+        </div>
+      </div>
+
+      <!-- Student 5 - SAFE -->
+      <div class="student-cam-card safe" id="card-4">
+        <div class="student-cam-view" id="scv-4">
+          <div class="mini-scan"></div>
+          <div class="mini-avatar" style="animation-delay:-1.5s"><div class="mhead"></div><div class="mbody"></div></div>
+          <div class="track-box-mini"></div>
+          <div class="student-score-badge sb-safe">8</div>
+          <div class="cam-off-overlay"><div class="cam-off-icon">📷</div><div class="cam-off-text">Cam Off</div></div>
+        </div>
+        <div class="student-cam-info">
+          <span class="student-name">Dev Patel</span>
+          <span class="student-status"><span class="status-dot" style="background:var(--safe)"></span><span style="color:var(--safe)">CLEAN · Attention 97%</span></span>
+          <button class="cam-toggle-btn" id="sbtn-4" onclick="toggleStudentCam(4)" style="margin-top:6px"><span class="btn-icon">📷</span><span>CAM ON</span></button>
+        </div>
+      </div>
+
+      <!-- Student 6 - ALERT -->
+      <div class="student-cam-card alert" id="card-5">
+        <div class="student-cam-view" id="scv-5">
+          <div class="mini-scan"></div>
+          <div class="mini-avatar" style="animation-delay:-2.5s"><div class="mhead"></div><div class="mbody"></div></div>
+          <div class="track-box-mini alert"></div>
+          <div class="student-score-badge sb-danger">91</div>
+          <div class="cam-off-overlay"><div class="cam-off-icon">📷</div><div class="cam-off-text">Cam Off</div></div>
+        </div>
+        <div class="student-cam-info">
+          <span class="student-name">Neha Gupta</span>
+          <span class="student-status"><span class="status-dot" style="background:var(--danger)"></span><span style="color:var(--danger)">HIGH RISK · Multi-person</span></span>
+          <button class="cam-toggle-btn" id="sbtn-5" onclick="toggleStudentCam(5)" style="margin-top:6px"><span class="btn-icon">📷</span><span>CAM ON</span></button>
+        </div>
+      </div>
+
+      <!-- Student 7 - SAFE -->
+      <div class="student-cam-card safe" id="card-6">
+        <div class="student-cam-view" id="scv-6">
+          <div class="mini-scan"></div>
+          <div class="mini-avatar" style="animation-delay:-3s"><div class="mhead"></div><div class="mbody"></div></div>
+          <div class="track-box-mini"></div>
+          <div class="student-score-badge sb-safe">19</div>
+          <div class="cam-off-overlay"><div class="cam-off-icon">📷</div><div class="cam-off-text">Cam Off</div></div>
+        </div>
+        <div class="student-cam-info">
+          <span class="student-name">Karan Mehta</span>
+          <span class="student-status"><span class="status-dot" style="background:var(--safe)"></span><span style="color:var(--safe)">CLEAN · Normal behavior</span></span>
+          <button class="cam-toggle-btn" id="sbtn-6" onclick="toggleStudentCam(6)" style="margin-top:6px"><span class="btn-icon">📷</span><span>CAM ON</span></button>
+        </div>
+      </div>
+
+      <!-- Student 8 - WARN -->
+      <div class="student-cam-card warn" id="card-7">
+        <div class="student-cam-view" id="scv-7">
+          <div class="mini-scan"></div>
+          <div class="mini-avatar" style="animation-delay:-0.8s"><div class="mhead"></div><div class="mbody"></div></div>
+          <div class="track-box-mini warn"></div>
+          <div class="student-score-badge sb-warn">48</div>
+          <div class="cam-off-overlay"><div class="cam-off-icon">📷</div><div class="cam-off-text">Cam Off</div></div>
+        </div>
+        <div class="student-cam-info">
+          <span class="student-name">Ishita Roy</span>
+          <span class="student-status"><span class="status-dot" style="background:var(--mid)"></span><span style="color:var(--mid)">SUSPICIOUS · Gesture</span></span>
+          <button class="cam-toggle-btn" id="sbtn-7" onclick="toggleStudentCam(7)" style="margin-top:6px"><span class="btn-icon">📷</span><span>CAM ON</span></button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── LIVE AI DETECTION PANEL ── -->
+  <div class="live-detection-section">
+    <div class="live-panel">
+
+      <div class="live-panel-header">
+        <div class="live-panel-title">
+          <span id="live-rec-dot" class="rec-dot" style="background:var(--muted);animation:none"></span>
+          Live AI Detection Feed
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <span class="detect-status" id="detect-status-badge">● OFFLINE</span>
+          <button class="btn-detect start" id="detect-btn" onclick="toggleDetection()">
+            <span>▶</span><span id="detect-btn-label">START DETECTION</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="live-feed-wrap" id="live-feed-wrap">
+        <div class="live-placeholder" id="live-placeholder">
+          <div class="ph-icon">🎥</div>
+          <div>Click <strong style="color:var(--accent3)">START DETECTION</strong> to activate the AI proctoring camera.</div>
+          <div style="color:var(--muted);font-size:0.62rem">Make sure <code style="color:var(--accent)">server.py</code> is running on localhost:5050</div>
+        </div>
+        <img id="live-stream-img" src="" alt="Live Feed"
+             style="display:none;width:100%;height:100%;object-fit:contain"
+             onerror="onStreamError()">
+        <!-- Gaze tracking cursor dot -->
+        <div id="hnf-gaze-cursor" style="display:none;position:absolute;width:18px;height:18px;border:2px solid var(--warn);border-radius:50%;pointer-events:none;z-index:20;transition:left 0.18s ease,top 0.18s ease;box-shadow:0 0 8px rgba(255,183,0,0.5)"></div>
+        <!-- No-face countdown -->
+        <div id="hnf-noface-warn" style="display:none;position:absolute;top:8px;left:50%;transform:translateX(-50%);background:rgba(255,77,109,0.93);border:1px solid var(--danger);border-radius:6px;padding:5px 14px;font-family:'JetBrains Mono',monospace;font-size:0.62rem;color:#fff;white-space:nowrap;z-index:30;backdrop-filter:blur(4px)">⚠ FACE NOT DETECTED — STOPPING IN <span id="hnf-noface-count">5</span>s</div>
+        <div id="hnf-noface-bar" style="display:none;position:absolute;bottom:0;left:0;right:0;height:4px;background:var(--danger);z-index:30;transition:width 1s linear;width:100%"></div>
+      </div>
+
+      <!-- Event log -->
+      <div id="hnf-event-log" style="max-height:130px;overflow-y:auto;padding:4px 0;border-top:1px solid var(--border)">
+        <div style="display:flex;gap:8px;padding:5px 16px;font-size:0.7rem">
+          <span style="font-size:0.8rem">ℹ</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:0.58rem;color:var(--muted);min-width:54px" id="hnf-init-time">--:--:--</span>
+          <span style="color:var(--accent)">System ready. Press START DETECTION to begin.</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SESSION STATS ROW -->
+  <div class="live-detection-section" style="margin-top:-16px;margin-bottom:0">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center">
+        <span style="font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;display:block;line-height:1;color:var(--accent)" id="hnf-kpi-duration">0:00</span>
+        <span style="font-size:0.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em">Session Time</span>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center">
+        <span style="font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;display:block;line-height:1;color:var(--danger)" id="hnf-kpi-flags">0</span>
+        <span style="font-size:0.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em">High-Risk Flags</span>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center">
+        <span style="font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;display:block;line-height:1;color:var(--mid)" id="hnf-kpi-gaze">0</span>
+        <span style="font-size:0.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em">Gaze Events</span>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center">
+        <span style="font-family:'Syne',sans-serif;font-size:1.4rem;font-weight:800;display:block;line-height:1;color:var(--safe)" id="hnf-kpi-clean">100%</span>
+        <span style="font-size:0.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em">Clean Time</span>
+      </div>
+    </div>
+    <!-- Sparkline -->
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden">
+      <div style="padding:10px 16px;font-family:'Syne',sans-serif;font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;border-bottom:1px solid var(--border)">Risk Score Over Time</div>
+      <div style="padding:8px 16px 12px">
+        <svg id="hnf-spark-svg" width="100%" height="60" viewBox="0 0 600 60" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="hnfSparkGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#ff4d6d" stop-opacity="0.25"/>
+              <stop offset="100%" stop-color="#ff4d6d" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <line x1="0" y1="45" x2="600" y2="45" stroke="#ff4d6d" stroke-width="0.8" stroke-dasharray="4 4" opacity="0.4"/>
+          <text x="3" y="42" font-family="JetBrains Mono" font-size="6" fill="#ff4d6d" opacity="0.6">ALERT THRESHOLD (50%)</text>
+          <path id="hnf-spark-path" d="M0,58 L600,58" fill="none" stroke="var(--accent)" stroke-width="2" opacity="0.85"/>
+          <path id="hnf-spark-area" d="M0,58 L600,58 L600,60 L0,60 Z" fill="url(#hnfSparkGrad)"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECENT ALERTS TABLE -->
+  <div class="two-col" style="margin-bottom:28px">
+    <div class="panel" style="grid-column: 1 / -1">
+      <div class="panel-title">Recent Alert Log</div>
+      <table class="alerts-table">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Student</th>
+            <th>Event</th>
+            <th>Risk Score</th>
+            <th>Severity</th>
+            <th>Model</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:0.65rem">14:32:07</td>
+            <td>Neha Gupta</td>
+            <td>Multiple faces detected in frame</td>
+            <td style="color:var(--danger);font-family:'Syne',sans-serif;font-weight:700">91</td>
+            <td><span class="tag tag-high">High</span></td>
+            <td style="color:var(--muted);font-size:0.65rem">YOLO v8</td>
+          </tr>
+          <tr>
+            <td style="color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:0.65rem">14:31:44</td>
+            <td>Arjun Sharma</td>
+            <td>Smartphone detected in environment</td>
+            <td style="color:var(--danger);font-family:'Syne',sans-serif;font-weight:700">87</td>
+            <td><span class="tag tag-high">High</span></td>
+            <td style="color:var(--muted);font-size:0.65rem">YOLO v8</td>
+          </tr>
+          <tr>
+            <td style="color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:0.65rem">14:31:12</td>
+            <td>Priya Verma</td>
+            <td>Sustained gaze deviation (left >15s)</td>
+            <td style="color:var(--mid);font-family:'Syne',sans-serif;font-weight:700">62</td>
+            <td><span class="tag tag-med">Med</span></td>
+            <td style="color:var(--muted);font-size:0.65rem">MediaPipe</td>
+          </tr>
+          <tr>
+            <td style="color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:0.65rem">14:30:55</td>
+            <td>Ananya Singh</td>
+            <td>Abnormal head yaw pattern detected</td>
+            <td style="color:var(--mid);font-family:'Syne',sans-serif;font-weight:700">54</td>
+            <td><span class="tag tag-med">Med</span></td>
+            <td style="color:var(--muted);font-size:0.65rem">ISO Forest</td>
+          </tr>
+          <tr>
+            <td style="color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:0.65rem">14:30:21</td>
+            <td>Ishita Roy</td>
+            <td>Suspicious hand gesture near face</td>
+            <td style="color:var(--mid);font-family:'Syne',sans-serif;font-weight:700">48</td>
+            <td><span class="tag tag-med">Med</span></td>
+            <td style="color:var(--muted);font-size:0.65rem">MediaPipe</td>
+          </tr>
+          <tr>
+            <td style="color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:0.65rem">14:29:08</td>
+            <td>Karan Mehta</td>
+            <td>Brief eye closure (possible fatigue)</td>
+            <td style="color:var(--safe);font-family:'Syne',sans-serif;font-weight:700">19</td>
+            <td><span class="tag tag-low">Low</span></td>
+            <td style="color:var(--muted);font-size:0.65rem">MediaPipe</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TECH STACK -->
+  <div class="section-title">Technology Stack</div>
+  <div class="tech-grid">
+    <div class="tech-card">
+      <span class="tech-icon">🎯</span>
+      <span class="tech-name">YOLO v8</span>
+      <span class="tech-desc">Face, eye, object detection</span>
+    </div>
+    <div class="tech-card">
+      <span class="tech-icon">🧠</span>
+      <span class="tech-name">MediaPipe</span>
+      <span class="tech-desc">Face & gesture recognition</span>
+    </div>
+    <div class="tech-card">
+      <span class="tech-icon">🌲</span>
+      <span class="tech-name">Isolation Forest</span>
+      <span class="tech-desc">Anomaly detection engine</span>
+    </div>
+    <div class="tech-card">
+      <span class="tech-icon">📷</span>
+      <span class="tech-name">OpenCV</span>
+      <span class="tech-desc">Real-time vision pipeline</span>
+    </div>
+    <div class="tech-card">
+      <span class="tech-icon">☁️</span>
+      <span class="tech-name">Cloud Deploy</span>
+      <span class="tech-desc">Scalable multi-student monitoring</span>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <div>
+    <div class="footer-brand">HACK-N-FORGE · Team Matrix</div>
+    <div class="footer-tagline">"Ensuring fair, secure, and trustworthy online assessments with AI."</div>
+  </div>
+  <div style="font-family:'JetBrains Mono',monospace;font-size:0.6rem;color:var(--muted)">
+    System Status: <span style="color:var(--safe)">● ALL SYSTEMS OPERATIONAL</span>
+  </div>
+</footer>
+
+<script>
+  // ── HERO CAM TOGGLE ──
+  let heroCamOn = true;
+  function toggleHeroCam() {
+    heroCamOn = !heroCamOn;
+    const view = document.getElementById('hero-cam-view');
+    const btn  = document.getElementById('hero-cam-btn');
+    const lbl  = document.getElementById('hero-cam-label');
+    const dot  = document.getElementById('hero-rec-dot');
+    const score = document.getElementById('hero-score-section');
+
+    if (heroCamOn) {
+      view.classList.remove('cam-off');
+      btn.classList.remove('off');
+      lbl.textContent = 'CAM ON';
+      dot.style.background = 'var(--accent2)';
+      dot.style.animation = 'pulse-dot 1.5s infinite';
+      score.classList.remove('cam-off');
+    } else {
+      view.classList.add('cam-off');
+      btn.classList.add('off');
+      lbl.textContent = 'CAM OFF';
+      dot.style.background = 'var(--muted)';
+      dot.style.animation = 'none';
+      score.classList.add('cam-off');
+    }
+  }
+
+  // ── STUDENT CAM TOGGLE ──
+  const studentCamState = [true, true, true, true, true, true, true, true];
+
+  function toggleStudentCam(idx) {
+    studentCamState[idx] = !studentCamState[idx];
+    applyStudentCamState(idx);
+  }
+
+  function applyStudentCamState(idx) {
+    const view = document.getElementById('scv-' + idx);
+    const btn  = document.getElementById('sbtn-' + idx);
+    const isOn = studentCamState[idx];
+
+    if (isOn) {
+      view.classList.remove('cam-off');
+      btn.classList.remove('off');
+      btn.querySelector('span:last-child').textContent = 'CAM ON';
+    } else {
+      view.classList.add('cam-off');
+      btn.classList.add('off');
+      btn.querySelector('span:last-child').textContent = 'CAM OFF';
+    }
+  }
+
+  // ── ALL CAMS TOGGLE ──
+  function setAllCams(state) {
+    for (let i = 0; i < 8; i++) {
+      studentCamState[i] = state;
+      applyStudentCamState(i);
+    }
+    if (heroCamOn !== state) toggleHeroCam();
+  }
+
+  // ════════════════════════════════════════════════════════════════
+  //  DETECTION + ANALYTICS ENGINE
+  //  - Nothing runs until START DETECTION is clicked
+  //  - All values start at 0
+  //  - Polling ONLY active while detectionRunning === true
+  // ════════════════════════════════════════════════════════════════
+
+  const API = 'http://localhost:5050';
+  let detectionRunning = false;
+  let _metricsInterval = null;
+
+  // ── Analytics state (all zero) ──────────────────────────────────
+  const hnf = {
+    sessionStart:       null,
+    durationId:         null,
+    sparkId:            null,
+    highRiskFlags:      0,
+    gazeEvents:         0,
+    totalTicks:         0,
+    cleanTicks:         0,
+    scoreHistory:       new Array(60).fill(0),
+    noFaceStart:        null,
+    noFaceTimer:        null,
+    noFaceMissCount:    0,      // consecutive frames with no face — debounce
+    _prevGaze:          false,
+    _prevPhone:         false,
+    _prevHigh:          false,
+    _verdictFired:      false,
+    _lastScore:         0,
+  };
+
+  // ── Time helpers ────────────────────────────────────────────────
+  function hnfPad(n) { return String(n).padStart(2,'0'); }
+  function hnfTime() {
+    const d = new Date();
+    return `${hnfPad(d.getHours())}:${hnfPad(d.getMinutes())}:${hnfPad(d.getSeconds())}`;
+  }
+  document.getElementById('hnf-init-time').textContent = hnfTime();
+
+  // ── Toast ───────────────────────────────────────────────────────
+  function hnfToast(msg, dur=2500) {
+    let t = document.getElementById('hnf-toast');
+    if (!t) return;
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), dur);
+  }
+
+  // ── Event log ───────────────────────────────────────────────────
+  function hnfLog(level, icon, text) {
+    const log  = document.getElementById('hnf-event-log');
+    if (!log) return;
+    const item = document.createElement('div');
+    item.style.cssText = 'display:flex;gap:8px;padding:5px 16px;font-size:0.7rem;border-bottom:1px solid rgba(255,255,255,0.03);animation:hnfFadeIn 0.3s ease';
+    const colors = { danger:'var(--danger)', warn:'var(--mid)', safe:'var(--safe)', info:'var(--accent)' };
+    item.innerHTML = `<span style="font-size:0.8rem">${icon}</span>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:0.58rem;color:var(--muted);min-width:54px">${hnfTime()}</span>
+      <span style="color:${colors[level]||'var(--text)'}">${text}</span>`;
+    log.prepend(item);
+    while (log.children.length > 40) log.removeChild(log.lastChild);
+  }
+
+  // ── Audio Engine ────────────────────────────────────────────────
+  let _hnfAudioCtx = null;
+  function hnfAudio() {
+    if (!_hnfAudioCtx) _hnfAudioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    if (_hnfAudioCtx.state === 'suspended') _hnfAudioCtx.resume();
+    return _hnfAudioCtx;
+  }
+  function hnfBeep(freq=880, dur=120, vol=0.4, type='square') {
+    try {
+      const ctx=hnfAudio(), osc=ctx.createOscillator(), gain=ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type=type; osc.frequency.setValueAtTime(freq,ctx.currentTime);
+      gain.gain.setValueAtTime(vol,ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+dur/1000);
+      osc.start(ctx.currentTime); osc.stop(ctx.currentTime+dur/1000);
+    } catch(e){}
+  }
+  function hnfDouble(freq=900,vol=0.45){ hnfBeep(freq,130,vol,'square'); setTimeout(()=>hnfBeep(freq*0.9,130,vol,'square'),200); }
+  function hnfTriple(){ hnfBeep(1100,100,0.6,'square'); setTimeout(()=>hnfBeep(1100,100,0.6,'square'),160); setTimeout(()=>hnfBeep(1300,180,0.7,'square'),320); }
+  function hnfSiren(){ let i=0,tones=[880,1100,880,1100,880,1100],iv=setInterval(()=>{ hnfBeep(tones[i%6],200,0.65,'sawtooth'); if(++i>=6) clearInterval(iv); },220); }
+
+  let _hnfHighBeepId=null;
+  function hnfStartHighBeep(){ if(_hnfHighBeepId) return; hnfDouble(950,0.45); _hnfHighBeepId=setInterval(()=>{ if(hnf._lastScore>=80&&detectionRunning) hnfDouble(950,0.45); else hnfStopHighBeep(); },2500); }
+  function hnfStopHighBeep(){ clearInterval(_hnfHighBeepId); _hnfHighBeepId=null; }
+
+  let _hnfNfBeepId=null;
+  function hnfStartNfBeep(){ if(_hnfNfBeepId) return; _hnfNfBeepId=setInterval(()=>{ if(hnf.noFaceStart) hnfDouble(800,0.5); else hnfStopNfBeep(); },1000); }
+  function hnfStopNfBeep(){ clearInterval(_hnfNfBeepId); _hnfNfBeepId=null; }
+
+  // ── No-face countdown ───────────────────────────────────────────
+  function hnfStartNoface() {
+    const warn=document.getElementById('hnf-noface-warn');
+    const bar=document.getElementById('hnf-noface-bar');
+    const cnt=document.getElementById('hnf-noface-count');
+    warn.style.display='block'; bar.style.display='block';
+    bar.style.width='100%'; cnt.textContent=5;
+    hnfBeep(700,200,0.35,'sine');
+    hnf.noFaceTimer=setInterval(()=>{
+      if(!hnf.noFaceStart){clearInterval(hnf.noFaceTimer);return;}
+      const el=Math.floor((Date.now()-hnf.noFaceStart)/1000);
+      const rem=Math.max(0,5-el);
+      cnt.textContent=rem;
+      bar.style.width=`${(rem/5)*100}%`;
+      bar.style.transition='width 1s linear';
+      if(rem===4) hnfBeep(750,150,0.38,'square');
+      if(rem===3) hnfDouble(800,0.44);
+      if(rem===2) hnfDouble(900,0.48);
+      if(rem===1) hnfTriple();
+      if(el>=5){ clearInterval(hnf.noFaceTimer); hnfSiren(); hnfStartNfBeep(); hnfTriggerVerdict(); }
+    },1000);
+  }
+  function hnfCancelNoface(){
+    hnf.noFaceStart=null; clearInterval(hnf.noFaceTimer); hnfStopNfBeep();
+    document.getElementById('hnf-noface-warn').style.display='none';
+    document.getElementById('hnf-noface-bar').style.display='none';
+    document.getElementById('hnf-noface-count').textContent='5';
+  }
+
+  // ── Cheat verdict ───────────────────────────────────────────────
+  function hnfTriggerVerdict(){
+    hnfCancelNoface();
+    document.getElementById('hnf-cheat-score-display').textContent=`Risk Score: ${hnf._lastScore} / 300`;
+    document.getElementById('hnf-cheat-timestamp').textContent=`Flagged at ${hnfTime()}`;
+    document.getElementById('hnf-cheat-overlay').classList.add('show');
+    document.body.style.outline='4px solid var(--danger)';
+    setTimeout(()=>document.body.style.outline='',2000);
+    hnfLog('danger','🚨','CHEATING DETECTED — face absent 5s');
+    hnf.highRiskFlags++;
+    document.getElementById('hnf-kpi-flags').textContent=hnf.highRiskFlags;
+  }
+  function hnfReportCheating(){
+    hnfStopNfBeep(); hnfStopHighBeep();
+    document.getElementById('hnf-cheat-overlay').classList.remove('show');
+    hnfToast('📋 Report logged'); hnfLog('danger','📋','Cheating report filed');
+  }
+  function hnfDismissOverlay(){
+    hnfStopNfBeep(); hnfStopHighBeep();
+    document.getElementById('hnf-cheat-overlay').classList.remove('show');
+    hnfLog('info','↺','Overlay dismissed'); hnfToast('Dismissed — press Start to resume');
+  }
+
+  // ── Gaze cursor ─────────────────────────────────────────────────
+  function hnfMoveCursor(leftDiff, rightDiff){
+    const cursor=document.getElementById('hnf-gaze-cursor');
+    const feed=document.getElementById('live-feed-wrap');
+    if(!detectionRunning||!cursor||!feed){cursor&&(cursor.style.display='none');return;}
+    cursor.style.display='block';
+    const avg=(leftDiff+rightDiff)/2;
+    const xPct=Math.max(5,Math.min(95, 50+(avg/0.3)*40));
+    cursor.style.left=`calc(${xPct}% - 9px)`;
+    cursor.style.top='calc(35% - 9px)';
+    const alert=Math.abs(avg)>0.1;
+    cursor.style.borderColor=alert?'var(--danger)':'var(--mid)';
+    cursor.style.boxShadow=alert?'0 0 8px rgba(255,77,109,0.6)':'0 0 8px rgba(255,183,0,0.5)';
+  }
+
+  // ── Sparkline ───────────────────────────────────────────────────
+  function hnfUpdateSpark(){
+    hnf.scoreHistory.push(hnf._lastScore);
+    if(hnf.scoreHistory.length>60) hnf.scoreHistory.shift();
+    const pts=hnf.scoreHistory, W=600, H=58, max=300;
+    const coords=pts.map((v,i)=>`${(i/(pts.length-1))*W},${H-(v/max)*H}`);
+    const path=`M${coords.join(' L')}`;
+    document.getElementById('hnf-spark-path').setAttribute('d',path);
+    document.getElementById('hnf-spark-area').setAttribute('d',`M0,${H} L${path.slice(1)} L${W},${H} Z`);
+  }
+
+  // ── Session start/stop ──────────────────────────────────────────
+  function hnfOnStart(){
+    hnf.sessionStart=Date.now();
+    hnf._verdictFired=false;
+    hnf._prevGaze=false;
+    hnf._prevPhone=false;
+    hnf._prevHigh=false;
+    hnf.noFaceMissCount=0;
+    hnf.durationId=setInterval(()=>{
+      if(!hnf.sessionStart) return;
+      const s=Math.floor((Date.now()-hnf.sessionStart)/1000);
+      document.getElementById('hnf-kpi-duration').textContent=`${Math.floor(s/60)}:${hnfPad(s%60)}`;
+    },1000);
+    hnf.sparkId=setInterval(hnfUpdateSpark,2000);
+    hnfLog('info','▶','Detection started — calibrating…');
+    hnfToast('✅ Detection active');
+  }
+  function hnfOnStop(){
+    clearInterval(hnf.durationId); clearInterval(hnf.sparkId);
+    hnf.sessionStart=null;
+    hnfCancelNoface(); hnfStopHighBeep(); hnfStopNfBeep();
+    document.getElementById('hnf-gaze-cursor').style.display='none';
+    hnfLog('info','■','Detection stopped');
+  }
+
+  // ── Core metrics apply ──────────────────────────────────────────
+  async function fetchAndApplyMetrics(){
+    if(!detectionRunning) return;
+    try {
+      const res=await fetch(`${API}/metrics`);
+      if(!res.ok) return;
+      const m=await res.json();
+
+      hnf._lastScore=Math.min(m.cheat_score,300);
+      const score=hnf._lastScore;
+      const scorePct=(score/300)*100;
+      const absYaw=Math.abs(m.head_yaw_delta||0);
+
+      // ── cam overlay chips ──────────────────────────────────────
+      document.getElementById('chip-head').textContent=`HEAD: ${((m.head_yaw_delta||0)*180).toFixed(1)}° YAW`;
+      const gc=document.getElementById('chip-gaze');
+      gc.textContent=`GAZE: ${m.gaze_status||'—'}`;
+      gc.style.color=m.gaze_alert?'var(--danger)':'var(--accent3)';
+      const pc=document.getElementById('chip-phone');
+      pc.textContent=m.phone_detected?'PHONE: ⚠ DETECTED':'PHONE: CLEAR';
+      pc.style.color=m.phone_detected?'var(--danger)':'var(--accent3)';
+      const level=score<80?'LOW':score<180?'MED':'HIGH';
+      const ac=document.getElementById('chip-anomaly');
+      ac.textContent=`ANOMALY: ${level}`;
+      ac.style.color=score<80?'var(--safe)':score<180?'var(--mid)':'var(--danger)';
+
+      // ── score card ─────────────────────────────────────────────
+      const sc=score<80?'var(--safe)':score<180?'var(--mid)':'var(--danger)';
+      const sl=score<80?'CLEAN':score<180?'SUSPICIOUS':'HIGH RISK';
+      document.getElementById('score-value-big').innerHTML=`${score}<span style="font-size:1rem;color:var(--muted)">/300</span>`;
+      document.getElementById('score-value-big').style.color=sc;
+      document.getElementById('score-label-status').textContent=sl;
+      document.getElementById('score-label-status').style.color=sc;
+      const bf=document.getElementById('score-bar-fill');
+      bf.style.width=`${scorePct}%`; bf.style.animation='none';
+
+      // ── score chips ────────────────────────────────────────────
+      const gd=document.getElementById('chip-gaze-dev');
+      gd.textContent=m.gaze_alert?'HIGH':m.gaze_violations>0?'MED':'LOW';
+      gd.className='chip-val '+(m.gaze_alert?'c-danger':m.gaze_violations>0?'c-warn':'c-safe');
+      const hd=document.getElementById('chip-head-pose');
+      hd.textContent=absYaw>0.15?'HIGH':absYaw>0.07?'MED':'LOW';
+      hd.className='chip-val '+(absYaw>0.15?'c-danger':absYaw>0.07?'c-warn':'c-safe');
+      const pd=document.getElementById('chip-phone-det');
+      pd.textContent=m.phone_detected?'ACTIVE':m.phone_violations>0?'PRIOR':'NONE';
+      pd.className='chip-val '+(m.phone_detected?'c-danger':m.phone_violations>0?'c-warn':'c-safe');
+
+      // ── behavior bars ──────────────────────────────────────────
+      const gazePct=Math.min((m.gaze_violations/20)*100,100).toFixed(0);
+      const headPct=Math.min((absYaw/0.25)*100,100).toFixed(0);
+      const phonePct=Math.min((m.phone_violations/5)*100,100).toFixed(0);
+      document.getElementById('bar-gaze-fill').style.width=`${gazePct}%`;
+      document.getElementById('bar-gaze-val').textContent=`${gazePct}%`;
+      document.getElementById('bar-head-fill').style.width=`${headPct}%`;
+      document.getElementById('bar-head-val').textContent=`${headPct}%`;
+      document.getElementById('bar-phone-fill').style.width=`${phonePct}%`;
+      document.getElementById('bar-phone-val').textContent=`${phonePct}%`;
+
+      // ── gaze cursor ────────────────────────────────────────────
+      hnfMoveCursor(m.left_diff||0, m.right_diff||0);
+
+      // ── MAX SCORE → stop webcam + continuous alarm ─────────────
+      if(score>=300 && !hnf._verdictFired){
+        hnf._verdictFired=true;
+        hnfLog('danger','🚨','MAX RISK SCORE REACHED — session terminated');
+        // stop the stream
+        await fetch(`${API}/stop`,{method:'POST'}).catch(()=>{});
+        detectionRunning=false;
+        const img=document.getElementById('live-stream-img');
+        img.src=''; img.style.display='none';
+        document.getElementById('live-placeholder').style.display='flex';
+        const btn=document.getElementById('detect-btn');
+        btn.className='btn-detect start';
+        btn.querySelector('span:first-child').textContent='▶';
+        document.getElementById('detect-btn-label').textContent='START DETECTION';
+        document.getElementById('detect-status-badge').textContent='● OFFLINE';
+        document.getElementById('detect-status-badge').className='detect-status';
+        document.getElementById('live-rec-dot').style.background='var(--muted)';
+        document.getElementById('live-rec-dot').style.animation='none';
+        stopMetricsPoll();
+        hnfOnStop();
+        // show verdict overlay with max score
+        document.getElementById('hnf-cheat-score-display').textContent='Risk Score: 300 / 300';
+        document.getElementById('hnf-cheat-timestamp').textContent=`Flagged at ${hnfTime()}`;
+        document.getElementById('hnf-cheat-overlay').classList.add('show');
+        document.body.style.outline='4px solid var(--danger)';
+        setTimeout(()=>document.body.style.outline='',3000);
+        // continuous alarm beep
+        hnfSiren();
+        hnfStartHighBeep();
+        return;
+      }
+
+      // ── NO-FACE detection — requires 4 consecutive missing polls ──
+      // This prevents false triggers from single dropped frames
+      if(m.calibrated){
+        if(!m.face_detected){
+          hnf.noFaceMissCount++;
+          if(hnf.noFaceMissCount>=4 && !hnf.noFaceStart){
+            hnf.noFaceStart=Date.now();
+            hnfStartNoface();
+            hnfLog('warn','⚠','Face not detected — countdown started');
+          }
+        } else {
+          // face back — reset counter and cancel any countdown
+          hnf.noFaceMissCount=0;
+          if(hnf.noFaceStart){
+            hnfCancelNoface();
+            hnfLog('safe','✅','Face re-detected — countdown cancelled');
+          }
+        }
+      }
+
+      // ── HIGH SCORE continuous beep ─────────────────────────────
+      if(score>=80) hnfStartHighBeep(); else hnfStopHighBeep();
+
+      // ── GAZE ALERT double-beep (rising edge only) ──────────────
+      if(m.gaze_alert && !hnf._prevGaze){
+        hnf.gazeEvents++;
+        document.getElementById('hnf-kpi-gaze').textContent=hnf.gazeEvents;
+        hnfDouble(880,0.4);
+        hnfLog('warn','👁','Gaze deviation — '+m.gaze_status);
+        hnfToast('👁 Gaze away: '+m.gaze_status, 2000);
+      }
+      hnf._prevGaze=m.gaze_alert;
+
+      // ── PHONE DETECTED siren (rising edge only) ────────────────
+      if(m.phone_detected && !hnf._prevPhone){
+        hnfSiren();
+        hnfToast('📱 Phone detected!',3500);
+        hnfLog('danger','📱','PHONE DETECTED in frame');
+        hnf.highRiskFlags++;
+        document.getElementById('hnf-kpi-flags').textContent=hnf.highRiskFlags;
+      }
+      hnf._prevPhone=m.phone_detected;
+
+      // ── HIGH RISK threshold triple-beep (rising edge only) ─────
+      if(score>=150 && !hnf._prevHigh){
+        hnfTriple();
+        hnfLog('danger','🚨','HIGH RISK — score '+score);
+        hnfToast('🚨 HIGH RISK — score '+score,3500);
+      }
+      hnf._prevHigh=score>=150;
+
+      // ── clean time ─────────────────────────────────────────────
+      hnf.totalTicks++;
+      if(score<50) hnf.cleanTicks++;
+      const cp=hnf.totalTicks>0?Math.round((hnf.cleanTicks/hnf.totalTicks)*100):100;
+      document.getElementById('hnf-kpi-clean').textContent=`${cp}%`;
+
+    } catch(_){}
+  }
+
+  // ── Polling control — ONLY starts on button click ───────────────
+  function startMetricsPoll(){
+    if(_metricsInterval) return;
+    _metricsInterval=setInterval(fetchAndApplyMetrics,500);  // 500ms = snappy real-time
+  }
+  function stopMetricsPoll(){
+    clearInterval(_metricsInterval);
+    _metricsInterval=null;
+  }
+
+  // ── Main toggle (start/stop detection) ──────────────────────────
+  async function toggleDetection(){
+    const btn    = document.getElementById('detect-btn');
+    const label  = document.getElementById('detect-btn-label');
+    const badge  = document.getElementById('detect-status-badge');
+    const recDot = document.getElementById('live-rec-dot');
+    const img    = document.getElementById('live-stream-img');
+    const ph     = document.getElementById('live-placeholder');
+
+    btn.className='btn-detect loading';
+    btn.querySelector('span:first-child').textContent='⏳';
+    label.textContent='CONNECTING...';
+
+    try {
+      if(!detectionRunning){
+        const res=await fetch(`${API}/start`,{method:'POST'});
+        if(!res.ok) throw new Error('Server error');
+        detectionRunning=true;
+        img.src=`${API}/video_feed?t=${Date.now()}`;
+        img.style.display='block'; ph.style.display='none';
+        btn.className='btn-detect stop';
+        btn.querySelector('span:first-child').textContent='■';
+        label.textContent='STOP DETECTION';
+        badge.textContent='● LIVE'; badge.className='detect-status active';
+        recDot.style.background='var(--accent2)';
+        recDot.style.animation='pulse-dot 1.5s infinite';
+        startMetricsPoll();   // ← ONLY starts here
+        hnfOnStart();
+      } else {
+        await fetch(`${API}/stop`,{method:'POST'});
+        detectionRunning=false;
+        img.src=''; img.style.display='none'; ph.style.display='flex';
+        btn.className='btn-detect start';
+        btn.querySelector('span:first-child').textContent='▶';
+        label.textContent='START DETECTION';
+        badge.textContent='● OFFLINE'; badge.className='detect-status';
+        recDot.style.background='var(--muted)'; recDot.style.animation='none';
+        stopMetricsPoll();    // ← ONLY stops here
+        hnfOnStop();
+      }
+    } catch(err){
+      btn.className='btn-detect start';
+      btn.querySelector('span:first-child').textContent='▶';
+      label.textContent='START DETECTION';
+      badge.textContent='● SERVER OFFLINE'; badge.className='detect-status';
+      badge.style.borderColor='var(--danger)'; badge.style.color='var(--danger)';
+      alert('Cannot connect to server.\nMake sure you ran: python server.py');
+    }
+  }
+
+  function onStreamError(){
+    if(detectionRunning){
+      const badge=document.getElementById('detect-status-badge');
+      badge.textContent='● RECONNECTING...';
+      badge.style.borderColor='var(--warn)'; badge.style.color='var(--warn)';
+      setTimeout(()=>{ const img=document.getElementById('live-stream-img'); if(detectionRunning) img.src=`${API}/video_feed?t=${Date.now()}`; },2000);
+    }
+  }
+</script>
+
+<!-- Toast -->
+<div id="hnf-toast" style="position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 20px;font-family:'JetBrains Mono',monospace;font-size:0.68rem;color:var(--text);z-index:5000;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:nowrap"></div>
+<style>
+  #hnf-toast.show{opacity:1}
+  @keyframes hnfFadeIn{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:none}}
+  #hnf-cheat-overlay{display:none;position:fixed;inset:0;background:rgba(5,10,15,0.97);z-index:9000;align-items:center;justify-content:center;flex-direction:column;gap:18px;backdrop-filter:blur(14px)}
+  #hnf-cheat-overlay.show{display:flex}
+  .hnf-cheat-icon{font-size:5rem;animation:hnfShake 0.5s ease infinite alternate}
+  @keyframes hnfShake{from{transform:rotate(-8deg) scale(1)}to{transform:rotate(8deg) scale(1.08)}}
+  .hnf-cheat-title{font-family:'Syne',sans-serif;font-size:clamp(2rem,6vw,4rem);font-weight:800;color:var(--danger);text-transform:uppercase;text-shadow:0 0 40px rgba(255,77,109,0.6);animation:hnfFlicker 1.5s ease infinite alternate}
+  @keyframes hnfFlicker{from{opacity:1}to{opacity:0.75}}
+  .hnf-cheat-sub{font-family:'JetBrains Mono',monospace;font-size:0.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.2em;text-align:center}
+  .hnf-cheat-score-box{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:800;color:var(--danger);background:rgba(255,77,109,0.1);border:1px solid rgba(255,77,109,0.4);border-radius:10px;padding:10px 28px}
+  .hnf-cheat-actions{display:flex;gap:12px;margin-top:6px;flex-wrap:wrap;justify-content:center}
+  .hnf-cheat-btn{font-family:'JetBrains Mono',monospace;font-size:0.65rem;text-transform:uppercase;letter-spacing:0.1em;padding:10px 22px;border-radius:8px;border:1px solid;cursor:pointer;transition:all 0.2s}
+  .hnf-btn-dismiss{border-color:var(--muted);background:rgba(96,112,128,0.15);color:var(--muted)}
+  .hnf-btn-report{border-color:var(--danger);background:rgba(255,77,109,0.15);color:var(--danger)}
+  #hnf-event-log::-webkit-scrollbar{width:3px}
+  #hnf-event-log::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+</style>
+
+<!-- Cheat Verdict Overlay -->
+<div id="hnf-cheat-overlay">
+  <div class="hnf-cheat-icon">🚨</div>
+  <div class="hnf-cheat-title">CHEATING DETECTED</div>
+  <div class="hnf-cheat-sub">Face absent from frame for 5 consecutive seconds</div>
+  <div class="hnf-cheat-score-box" id="hnf-cheat-score-display">Risk Score: 0 / 300</div>
+  <div class="hnf-cheat-sub" id="hnf-cheat-timestamp">Flagged at --:--:--</div>
+  <div class="hnf-cheat-actions">
+    <button class="hnf-cheat-btn hnf-btn-report"  onclick="hnfReportCheating()">📋 Log Report</button>
+    <button class="hnf-cheat-btn hnf-btn-dismiss" onclick="hnfDismissOverlay()">↺ Dismiss & Resume</button>
+  </div>
+</div>
+</body>
+</html>
